@@ -1,0 +1,45 @@
+{
+  "indexes": [
+    {
+      "collection": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "mode": "ASCENDING" },
+        { "fieldPath": "rating", "mode": "DESCENDING" }
+      ]
+    },
+    {
+      "collection": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "affiliateProvider", "mode": "ASCENDING" },
+        { "fieldPath": "lastUpdated", "mode": "DESCENDING" }
+      ]
+    },
+    {
+      "collection": "blogPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "mode": "ASCENDING" },
+        { "fieldPath": "publishedAt", "mode": "DESCENDING" }
+      ]
+    },
+    {
+      "collection": "blogPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "mode": "ASCENDING" },
+        { "fieldPath": "publishedAt", "mode": "DESCENDING" }
+      ]
+    },
+    {
+      "collection": "blogPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tags", "mode": "ASCENDING" },
+        { "fieldPath": "publishedAt", "mode": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

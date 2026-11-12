@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+  
+  /* Colores personalizados */
+  --indigo-500: #6312ff;
+  --indigo-600: #5100e6;
+  --emerald-500: #06b698;
+  --emerald-600: #059669;
+  
+  /* Transiciones suaves */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-inter);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Gradientes animados */
+.bg-gradient-animated {
+  background: linear-gradient(270deg, #6312ff, #06b698, #ff6b6b, #6312ff);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Botones modernos */
+.btn-primary {
+  @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-indigo-200;
+}
+
+.btn-primary:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Cards con sombra moderna */
+.card {
+  @apply bg-white rounded-xl shadow-lg border border-gray-100;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+}
+
+/* Line clamp para texto */
+.line-clamp-2 {
+  @apply line-clamp-2;
+}
+
+.line-clamp-3 {
+  @apply line-clamp-3;
+}
+
+/* Skeleton loading */
+.skeleton {
+  @apply bg-gray-200 rounded-lg animate-pulse;
+}
+
+/* Badge de IA */
+.badge-ai {
+  @apply bg-emerald-600 text-white text-xs px-2 py-1 rounded-full font-bold;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    @apply hidden;
+  }
+}
+
+/* Preload important resources */
+<link rel="preload" href="/favicon.ico" as="image" />
+
+/* SEO Styles */
+seo-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/services/*": ["src/services/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/types/*": ["src/types/*"],
+      "@/ai/*": ["src/ai/*"],
+      "@/data/*": ["src/data/*"],
+      "@/firebase": ["src/firebase.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}

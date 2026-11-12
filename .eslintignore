@@ -1,0 +1,6 @@
+.next
+out
+node_modules
+firebase-debug.log
+.env.local
+firebase-debug.log

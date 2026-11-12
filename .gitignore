@@ -19,10 +19,10 @@ yarn.lock
 .env.development
 .env.production
 
-# Build artifacts
-*.js
-*.css
-*.map
+# Build artifacts (en producción)
+# *.js
+# *.css
+# *.map
 
 # IDE
 .vscode/
