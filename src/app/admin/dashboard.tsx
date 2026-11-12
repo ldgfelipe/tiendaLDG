@@ -132,7 +132,7 @@ function ProductRow({ product }: { product: Product }) {
       <div className="flex-1">
         <h3 className="font-medium">{product.title}</h3>
         <p className="text-sm text-gray-500">
-          ${product.price} • {product.provider}
+          ${product.price} • {product.affiliateProvider || 'N/A'}
         </p>
       </div>
       <div className="text-right">

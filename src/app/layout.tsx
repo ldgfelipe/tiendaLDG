@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import Layout from '@/components/Layout';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,7 +23,9 @@ export default function RootLayout({
     <html lang="es">
       <head />
       <body className={`${inter.variable} font-sans antialiased bg-gradient-to-br from-slate-50 to-indigo-50`}>
-        <Layout>{children}</Layout>
+        <Header />
+        {children}
+        <Footer />
       </body>
     </html>
   );

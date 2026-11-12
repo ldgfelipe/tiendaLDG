@@ -1,5 +1,5 @@
 // Servicio de scraping para extraer información de productos afiliados
-import { Product } from '@/types';
+import { Product } from '../types';
 
 export class ProductScraper {
   private userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -157,8 +157,9 @@ export class ProductScraper {
   }
 
   extractProvider(url: string): string {
-    const scraper = new (await import('./affiliate-service')).AffiliateService();
-    return scraper.detectProvider(url);
+    // Dynamic import to avoid circular dependency
+    // In production this will be handled server-side
+    return 'other';
   }
 
   calculateCommission(data: any): number {

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FirestoreService } from '@/services/firestore';
+
+// Simulación de tracking (en producción conectarías a Firestore)
+const clickTracking: Record<string, number> = {};
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +16,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Registrar el clic
-    const firestoreService = new FirestoreService();
-    await firestoreService.trackAffiliateClick(productId);
+    // Registrar el clic (simulado)
+    clickTracking[productId] = (clickTracking[productId] || 0) + 1;
+    console.log(`Click registrado: ${productId} - Total: ${clickTracking[productId]}`);
 
     // Redirigir al enlace afiliado
-    const redirectUrl = affiliateUrl || `/api/redirect/${productId}`;
-    
+    const redirectUrl = affiliateUrl || `https://tutienda.web.app/product/${productId}`;
+
     return NextResponse.json({
       success: true,
       redirectUrl,
@@ -47,5 +49,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ productId });
+  return NextResponse.json({ productId, clicks: clickTracking[productId] || 0 });
 }

@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIService } from '@/services/ai-service';
 
-const aiService = new AIService();
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+
+async function callOpenAI(messages: any[], maxTokens: number = 500) {
+  const response = await fetch(OPENAI_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: maxTokens
+    })
+  });
+  return response.json();
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,28 +57,15 @@ Instrucciones adicionales:
 `;
 
     // Llamada a OpenAI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message },
-          ...(context?.previousMessages || []).map((msg: any) => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
+    const data = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: message },
+      ...(context?.previousMessages || []).map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      }))
+    ], 500);
 
-    const data = await response.json();
     const responseText = data.choices[0]?.message?.content || 'Lo siento, no pude procesar tu pregunta.';
 
     return NextResponse.json({

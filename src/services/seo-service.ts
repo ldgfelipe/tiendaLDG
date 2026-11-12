@@ -37,7 +37,7 @@ export class SEOService {
     const keywords = this.extractBlogKeywords(title, excerpt, post);
     
     return {
-      title: this.optimizeBlogTitle(title),
+      title: this.optimizeTitle(title, post),
       description: this.truncateDescription(excerpt, 155),
       keywords,
       canonicalUrl: `${this.siteUrl}/blog/${post?.slug || 'unknown'}`,

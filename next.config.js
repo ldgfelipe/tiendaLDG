@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
 
 const nextConfig = {
   reactStrictMode: true,
@@ -20,24 +21,15 @@ const nextConfig = {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     NEXT_PUBLIC_NICHE: process.env.NEXT_PUBLIC_NICHE || 'ropa-y-calzado',
   },
-  async redirects() {
-    return [
-      {
-        source: '/old-home',
-        destination: '/',
-        permanent: true,
-      },
-    ];
+  webpack: (config) => {
+    // Resolver alias para @/
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.join(__dirname, 'src'),
+    };
+    return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ];
-  },
-  async headers() {
+  headers() {
     return [
       {
         source: '/(.*)',

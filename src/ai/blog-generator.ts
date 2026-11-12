@@ -1,6 +1,6 @@
 // Generador automático de blog con IA
-import { AIService } from '@/services/ai-service';
-import { BlogPost, Product } from '@/types';
+import { AIService } from '../services/ai-service';
+import { BlogPost, Product } from '../types';
 
 export class BlogGenerator {
   private aiService: AIService;

@@ -12,6 +12,7 @@ export interface Product {
   category: string[];
   rating: number;
   reviewCount: number;
+  clickCount?: number;
   affiliateProvider: string;
   commission: number;
   lastUpdated: Date;
@@ -32,7 +33,7 @@ export interface AffiliateLink {
 }
 
 export interface BlogPost {
-  id: string;
+  id?: string;
   title: string;
   slug: string;
   excerpt: string;
