@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "import:data": "node scripts/import-initial-data.js",
+    "import:products": "node scripts/import-products.js",
+    "import:blog": "node scripts/import-blog.js",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
+    "fix:images": "node scripts/fix-image-paths.js"
+  }
+}

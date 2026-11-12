@@ -1,0 +1,67 @@
+{
+  "name": "tienda-ldg-referidos",
+  "version": "1.0.0",
+  "description": "Tienda de referidos premium con IA y SEO optimizado",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css}\" && prettier --write \"./**/*.{json,md}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next out",
+    "firebase": "firebase tools",
+    "deploy": "npm run build && firebase deploy",
+    "preview": "npm run build && firebase hosting:channel:deploy preview"
+  },
+  "dependencies": {
+    "next": "14.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "firebase": "^10.12.2",
+    "lucide-react": "^0.320.0",
+    "framer-motion": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.0",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
+    "autoprefixer": "10.4.16",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.4",
+    "postcss": "8.4.37",
+    "tailwindcss": "3.4.3",
+    "typescript": "5.4.2"
+  },
+  "keywords": [
+    "tienda",
+    "afiliados",
+    "referidos",
+    "seo",
+    "ia",
+    "marketing",
+    "ropa",
+    "calzado"
+  ],
+  "author": "TiendaLDG",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ldgfelipe/tiendaLDG/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ldgfelipe/tiendaLDG.git"
+  },
+  "homepage": "https://tutienda.web.app",
+  "homepage": "https://tutienda.web.app",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true,
+  "standard": {
+    "indent": 2,
+    "quotes": "double",
+    "semi": true
+  }
+}
