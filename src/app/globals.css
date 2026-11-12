@@ -7,28 +7,114 @@
 
 :root {
   --font-inter: 'Inter', sans-serif;
-  --font-playfair: 'Playfair Display', serif;
+  --primary: #6312ff;
+  --primary-dark: #5100e6;
+  --secondary: #06b698;
+  --secondary-dark: #059669;
 }
 
-* {
+/* Reset básico */
+*, *::before, *::after {
   box-sizing: border-box;
-}
-
-html, body {
-  padding: 0;
   margin: 0;
-  font-family: var(--font-inter);
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
   scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  font-family: var(--font-inter);
+  background: linear-gradient(135deg, #f0f4ff 0%, #f8f9fa 100%);
+  min-height: 100vh;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Enlaces */
 a {
-  color: inherit;
+  color: var(--primary);
   text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--primary-dark);
 }
 
-img {
-  max-width: 100%;
-  display: block;
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Botones */
+.btn {
+  @apply px-4 py-2 rounded-full font-medium transition-all duration-200;
+}
+.btn-primary {
+  @apply bg-purple-600 hover:bg-purple-700 text-white;
+}
+.btn-secondary {
+  @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+}
+.btn-outline {
+  @apply border-2 border-gray-300 hover:border-purple-600 text-gray-700 hover:text-purple-600;
+}
+
+/* Cards */
+.card {
+  @apply bg-white rounded-xl shadow-lg border border-gray-100;
+}
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+}
+
+/* Grid responsive */
+.grid-responsive {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Imagen placeholder */
+.placeholder-img {
+  @apply bg-gray-200 rounded-lg flex items-center justify-center;
+}
+
+/* Badge */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+}
+.badge-primary {
+  @apply bg-purple-600 text-white;
+}
+.badge-success {
+  @apply bg-emerald-600 text-white;
+}
+
+/* Animaciones suaves */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply w-5 h-5 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin;
 }

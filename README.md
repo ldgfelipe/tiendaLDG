@@ -353,6 +353,51 @@ console.log(chatData.response);
 
 ---
 
+## 🎨 Diseño Visual
+
+### 🎯 Estado actual
+- ✅ CSS básico configurado con Tailwind CSS
+- ✅ Paleta de colores definida (Púrpura #6312ff, Verde #06b698)
+- ⚠️ **Necesitas agregar imágenes reales de productos**
+
+### 📁 Imágenes creadas
+Ejecuta este script para generar placeholders visuales:
+```bash
+node scripts/create-placeholders.js
+```
+
+Esto crea:
+```
+public/images/
+├── og-image.svg              # Social media preview
+├── favicon.svg               # Ícono del sitio
+├── products/
+│   ├── botas-mountain.svg    # Placeholder botas
+│   ├── zapatillas-running.svg # Placeholder running
+│   └── jeans-clasicos.svg    # Placeholder jeans
+└── blog/
+    └── blog-default.svg      # Placeholder blog
+```
+
+### 🎨 Para agregar estilos visuales
+
+Los componentes usan clases Tailwind. Ejemplo:
+```tsx
+// ProductCard ejemplo con estilos
+<div className="card card-hover transition-all duration-300">
+  <img src={product.image} alt={product.title} className="w-full h-48 object-cover" />
+  <h3 className="text-lg font-bold">{product.title}</h3>
+  <button className="btn btn-primary">Comprar</button>
+</div>
+```
+
+### 🔗 Recursos de diseño
+- **Paleta:** `styleguide.md`
+- **Ejemplos:** `DESIGN.md`
+- **Imágenes placeholder:** Script automático
+
+---
+
 ## 🎯 Nichos Soportados
 
 ### Nicho Principal: Ropa y Calzado ✅
