@@ -1,0 +1,79 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { AIService } from '@/services/ai-service';
+
+const aiService = new AIService();
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { message, context } = body;
+
+    if (!message) {
+      return NextResponse.json(
+        { error: 'message es requerido' },
+        { status: 400 }
+      );
+    }
+
+    // Construir prompt para el asistente
+    const systemPrompt = `
+Eres un asistente de IA experto en marketing de afiliados especializado en ropa y calzado.
+Ayuda a los usuarios a encontrar productos de calidad con recomendaciones personalizadas.
+
+Categoría principal: ropa y calzado
+
+Producto disponibles: ${context?.products?.map((p: any) => `- ${p.title} (${p.category})`).join('\n') || 'Ninguno'}
+
+Reglas:
+1. Responde en español con un tono profesional y amable
+2. Proporciona recomendaciones basadas en necesidades del usuario
+3. Si mencionas un producto, incluye el enlace de afiliado
+4. No menciones que eres IA ni uses términos como "como modelo de lenguaje"
+5. Sé conciso pero informativo (máximo 3 párrafos por respuesta)
+6. Pregunta siempre si necesitan más ayuda
+
+Instrucciones adicionales:
+- Usa palabras clave de SEO naturalmente
+- Menciona ventajas de productos recomendados
+- Incluye datos de verdad para productos conocidos
+- Si no sabes algo, di que lo investigarás y ofrece ayuda
+`;
+
+    // Llamada a OpenAI
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
+          ...(context?.previousMessages || []).map((msg: any) => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
+
+    const data = await response.json();
+    const responseText = data.choices[0]?.message?.content || 'Lo siento, no pude procesar tu pregunta.';
+
+    return NextResponse.json({
+      response: responseText,
+      usage: data.usage
+    });
+
+  } catch (error) {
+    console.error('Error in chat API:', error);
+    return NextResponse.json(
+      { error: 'Error al procesar tu mensaje' },
+      { status: 500 }
+    );
+  }
+}
