@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+*.pem
+
+# Next.js
+.next/
+out/
+cache/
+.modern.css
+.nyc_output/
+
+# Production
+package-lock.json
+yarn.lock
+
+# Environment variables - NO subir a GitHub
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Build artifacts
+*.js
+*.css
+*.map
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Firebase
+.firebase-debug-log
+
+# GitHub
+*.zip
+*.tar
+
+# Misc
+*.tmp
+*.temp
+dist/
+build/
+
+# Service account
+serviceAccountKey.json

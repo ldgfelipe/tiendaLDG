@@ -1,0 +1,30 @@
+# Asignar ownership a los archivos principales
+
+# Propietario principal
+* @ldgfelipe
+
+# Documentación
+*.md @ldgfelipe
+
+# Configuración
+*.json @ldgfelipe
+*.js @ldgfelipe
+tsconfig.json @ldgfelipe
+tailwind.config.js @ldgfelipe
+next.config.js @ldgfelipe
+firebase.json @ldgfelipe
+
+# Código fuente
+src/components/ @ldgfelipe
+src/services/ @ldgfelipe
+src/app/ @ldgfelipe
+src/ai/ @ldgfelipe
+src/types/ @ldgfelipe
+src/utils/ @ldgfelipe
+src/data/ @ldgfelipe
+src/firebase.ts @ldgfelipe
+
+# Scripts
+scripts/ @ldgfelipe
+*.sh @ldgfelipe
+*.bat @ldgfelipe

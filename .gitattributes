@@ -1,0 +1,22 @@
+* text=auto
+*.ts text
+*.tsx text
+*.css text
+*.json text
+*.md text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Shell scripts
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Normalize exports for GitHub
+*.ts export-subst
+*.tsx export-subst
