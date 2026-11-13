@@ -2,21 +2,30 @@
 *.ts text
 *.tsx text
 *.css text
-*.json text
 *.md text
-
-# Binary files
-*.png binary
+*.js text
+*.svg text
 *.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.pdf binary
+*.png binary
 
-# Shell scripts
+# Next.js
+.next/ export
+out/ export
+
+# Build artifacts
+*.log text
+npm-debug.log* text
+
+# Config files
+*.json text
+*.yml text
+*.yaml text
+
+# Shell scripts use LF
 *.sh text eol=lf
+
+# Windows scripts use CRLF
 *.bat text eol=crlf
 
-# Normalize exports for GitHub
-*.ts export-subst
-*.tsx export-subst
+# Normal text files
+*.txt text
