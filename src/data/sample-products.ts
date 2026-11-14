@@ -9,11 +9,10 @@ export const sampleProducts: Product[] = [
     price: 129.99,
     originalPrice: 179.99,
     affiliateLink: 'https://amzn.to/sample-affiliate-link',
-    image: '/images/products/botas-mountain.jpg',
+    image: '/images/products/botas-mountain.svg',
     images: [
-      '/images/products/botas-mountain-1.jpg',
-      '/images/products/botas-mountain-2.jpg',
-      '/images/products/botas-mountain-3.jpg'
+      '/images/products/botas-mountain.svg',
+      '/images/products/botas-mountain.svg'
     ],
     category: ['Calzado', 'Montaña', 'Aventura'],
     rating: 4.7,
@@ -59,11 +58,8 @@ export const sampleProducts: Product[] = [
     description: 'Zapatillas de running Ultraligeras con tecnología de amortiguación FluidFoam y soporte anatómico. Reducción de impacto hasta 35%.',
     price: 159.0,
     affiliateLink: 'https://amzn.to/sample-running-link',
-    image: '/images/products/zapatillas-running.jpg',
-    images: [
-      '/images/products/zapatillas-running-1.jpg',
-      '/images/products/zapatillas-running-2.jpg'
-    ],
+    image: '/images/products/zapatillas-running.svg',
+    images: ['/images/products/zapatillas-running.svg'],
     category: ['Calzado', 'Running', 'Deporte'],
     rating: 4.8,
     reviewCount: 256,
@@ -105,8 +101,8 @@ export const sampleProducts: Product[] = [
     price: 79.9,
     originalPrice: 99.9,
     affiliateLink: 'https://amzn.to/sample-jeans-link',
-    image: '/images/products/jeans-clasicos.jpg',
-    images: ['/images/products/jeans-clasicos.jpg'],
+    image: '/images/products/jeans-clasicos.svg',
+    images: ['/images/products/jeans-clasicos.svg'],
     category: ['Ropa', 'Hombre', 'Calzado'],
     rating: 4.6,
     reviewCount: 89,
