@@ -10,7 +10,7 @@ cache/
 .nyc_output/
 
 # Production
-package-lock.json
+# package-lock.json  # Required for Firebase App Hosting build
 yarn.lock
 
 # Environment variables - NO subir a GitHub
