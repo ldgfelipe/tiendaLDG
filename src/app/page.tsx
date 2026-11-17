@@ -28,7 +28,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-20">
+      <section className="bg-gradient-to-br from-purple-600 to-indigo-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">
             Ropa y Calzado Premium
@@ -90,7 +90,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-16">
+      <section className="bg-gradient-to-br from-purple-600 to-indigo-600 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             ¿Tienes un producto que recomendar?

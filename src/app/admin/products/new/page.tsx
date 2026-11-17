@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/types';
+import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
 
-export default function AdminNewProduct() {
+const CATEGORIES = ['Calzado', 'Ropa', 'Tecnología', 'Hogar', 'Belleza', 'Deportes'];
+
+function ProductForm() {
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
@@ -120,9 +123,9 @@ export default function AdminNewProduct() {
                     className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg"
                   >
                     <option value="">Seleccionar...</option>
-                    <option value="Calzado">Calzado</option>
-                    <option value="Ropa">Ropa</option>
-                    <option value="Tecnología">Tecnología</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -156,5 +159,13 @@ export default function AdminNewProduct() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminNewProduct() {
+  return (
+    <AdminAuthProvider>
+      <ProductForm />
+    </AdminAuthProvider>
   );
 }

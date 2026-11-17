@@ -1,6 +1,5 @@
-import { ReactNode } from 'react';
-import { AuthProvider } from '@/hooks/useAuth';
-import AdminRoute from '@/components/AdminRoute';
+// Server Component - Admin Layout
+// Este layout envuelve todas las páginas del admin
 
 export default function AdminLayout({
   children,
@@ -8,8 +7,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
-      <AdminRoute>{children}</AdminRoute>
-    </AuthProvider>
+    <>{children}</>
   );
 }

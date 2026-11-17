@@ -1,12 +1,34 @@
 'use client';
 
-import { useAuth } from '@/hooks/useAuth';
-import { Product } from '@/types';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
 import { sampleProducts } from '@/data/sample-products';
 
-export default function AdminDashboard() {
-  const { user, logout } = useAuth();
+function DashboardContent() {
+  const { user, loading, logout } = useAdminAuth();
+  const router = useRouter();
+
+  // Redirigir a login si no está autenticado
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/admin/login');
+    }
+  }, [user, loading, router]);
+
+  // Mostrar loading mientras Firebase verifica
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-purple-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Si no hay usuario, no renderizar
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,7 +38,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Hola, {user?.email}</span>
+              <span className="text-sm text-gray-600">Hola, {user.email?.split('@')[0]}</span>
               <button
                 onClick={() => logout()}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
@@ -53,24 +75,24 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold mb-4">Acciones Rápidas</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
+            <a
               href="/admin/products/new"
               className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
             >
               + Generar Producto con IA
-            </Link>
-            <Link
+            </a>
+            <a
               href="/admin/products"
               className="bg-blue-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
             >
               Ver Todos los Productos
-            </Link>
-            <Link
+            </a>
+            <a
               href="/admin/blog"
               className="bg-emerald-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
             >
               Blog Automático
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -84,12 +106,12 @@ export default function AdminDashboard() {
                 <p className="text-sm text-gray-600 mb-3">{product.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-purple-600">${product.price}</span>
-                  <Link
+                  <a
                     href={`/products/${product.id}`}
                     className="text-sm text-indigo-600 hover:underline"
                   >
                     Ver detalles
-                  </Link>
+                  </a>
                 </div>
               </div>
             ))}
@@ -97,5 +119,13 @@ export default function AdminDashboard() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <AdminAuthProvider>
+      <DashboardContent />
+    </AdminAuthProvider>
   );
 }

@@ -1,16 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { user, loading: authLoading, login } = useAdminAuth();
   const router = useRouter();
+
+  // Redirigir si ya está logueado
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/admin/dashboard');
+    }
+  }, [user, authLoading, router]);
+
+  // Mostrar loading mientras Firebase verifica la sesión
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-white border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Si ya está logueado, no mostrar formulario
+  if (user) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,5 +107,13 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <AdminAuthProvider>
+      <LoginForm />
+    </AdminAuthProvider>
   );
 }
