@@ -37,6 +37,7 @@ export class ProductScraper {
     if (url.includes('shareasale.com')) return 'shareasale';
     if (url.includes('clickbank.')) return 'clickbank';
     if (url.includes('cj.com')) return 'cj';
+    if (url.includes('mercadolibre.com') || url.includes('merco')) return 'mercadolibre';
     return 'generic';
   }
 
