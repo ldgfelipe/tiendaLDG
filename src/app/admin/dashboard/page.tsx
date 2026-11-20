@@ -2,33 +2,73 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
-import { sampleProducts } from '@/data/sample-products';
+import { useAdminAuth } from '@/components/AdminAuthWrapper';
+import { Product } from '@/types';
 
 function DashboardContent() {
   const { user, loading, logout } = useAdminAuth();
   const router = useRouter();
 
-  // Redirigir a login si no está autenticado
+  // Redirigir si no está autenticado (hooks en mismo orden)
   useEffect(() => {
     if (!loading && !user) {
       router.push('/admin/login');
     }
   }, [user, loading, router]);
 
-  // Mostrar loading mientras Firebase verifica
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-purple-600 border-t-transparent"></div>
-      </div>
-    );
-  }
+  // State en orden consistente
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Si no hay usuario, no renderizar
-  if (!user) {
-    return null;
-  }
+  // Cargar productos - useEffect al final
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoadingProducts(true);
+      try {
+        // En producción, traería desde Firebase/Firestore API
+        // Por ahora: datos mock o vacíos
+        const mockProducts: any[] = [
+          {
+            id: '1',
+            title: 'Producto en carga',
+            description: 'El primer producto se está agregando...',
+            price: 0,
+            originalPrice: null,
+            category: ['Sin categoría'],
+            affiliateLink: '',
+            affiliateProvider: 'manual',
+            image: '/placeholder-product.jpg',
+            images: ['/placeholder-product.jpg'],
+            rating: 0,
+            reviewCount: 0,
+            clickCount: 0,
+            seoKeywords: [],
+            aiSummary: 'Producto recién agregado al catálogo',
+          }
+        ];
+        setProducts(mockProducts);
+        setError(null);
+      } catch (err) {
+        console.error('Error cargando productos:', err);
+        setProducts([]);
+        setError('Error al cargar productos. Inténtalo de nuevo.');
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    loadProducts();
+  }, []); // Dependency array vacío - llamado solo una vez
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('¿Estás seguro de eliminar este producto?')) {
+      try {
+        setProducts(products.filter(p => p.id !== id));
+      } catch (error) {
+        console.error('Error eliminando producto:', error);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,7 +78,7 @@ function DashboardContent() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Hola, {user.email?.split('@')[0]}</span>
+              <span className="text-sm text-gray-600">Hola, {user?.email?.split('@')[0] || 'Admin'}</span>
               <button
                 onClick={() => logout()}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
@@ -55,67 +95,105 @@ function DashboardContent() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <h3 className="text-sm text-gray-600">Productos</h3>
-            <p className="text-2xl font-bold text-purple-600">{sampleProducts.length}</p>
+            <p className="text-2xl font-bold text-purple-600">{products.length}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <h3 className="text-sm text-gray-600">Clicks</h3>
-            <p className="text-2xl font-bold text-emerald-600">1,200</p>
+            <p className="text-2xl font-bold text-emerald-600">0</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <h3 className="text-sm text-gray-600">Conversiones</h3>
-            <p className="text-2xl font-bold text-indigo-600">86</p>
+            <p className="text-2xl font-bold text-indigo-600">0</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <h3 className="text-sm text-gray-600">Ingresos</h3>
-            <p className="text-2xl font-bold text-pink-600">$2,340</p>
+            <p className="text-2xl font-bold text-pink-600">$0</p>
           </div>
         </div>
+      </section>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Acciones Rápidas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a
-              href="/admin/products/new"
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
-            >
-              + Generar Producto con IA
-            </a>
-            <a
-              href="/admin/products"
-              className="bg-blue-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
-            >
-              Ver Todos los Productos
-            </a>
-            <a
-              href="/admin/blog"
-              className="bg-emerald-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
-            >
-              Blog Automático
-            </a>
-          </div>
+      {/* Content */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="flex gap-4 mb-8">
+          <a
+            href="/admin/products/new"
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
+          >
+            + Agregar Nuevo Producto
+          </a>
         </div>
 
-        {/* Recent Products */}
+        {/* Products Grid */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold mb-4">Productos Recientes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sampleProducts.map((product) => (
-              <div key={product.id} className="border rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-2">{product.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">{product.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-purple-600">${product.price}</span>
-                  <a
-                    href={`/products/${product.id}`}
-                    className="text-sm text-indigo-600 hover:underline"
-                  >
-                    Ver detalles
-                  </a>
+          <h2 className="text-xl font-bold mb-4">Productos en Catálogo</h2>
+
+          {/* Loading State */}
+          {loadingProducts && !error ? (
+            <div className="min-h-[200px] flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent mx-auto mb-4"></div>
+              <p className="text-gray-500">Cargando productos...</p>
+            </div>
+          ) : null}
+
+          {/* Error State */}
+          {loadingProducts && error ? (
+            <div className="p-6 bg-red-50 rounded-lg text-red-700">
+              <p className="font-medium">{error}</p>
+            </div>
+          ) : null}
+
+          {/* Empty State */}
+          {!loadingProducts && products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No hay productos en el catálogo</p>
+              <p className="text-sm text-gray-400">Sé el primero en agregar un producto</p>
+            </div>
+          ) : null}
+
+          {/* Products List */}
+          {!loadingProducts && products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product: any) => (
+                <div key={product.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="h-32 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                    <img
+                      src={product.image || '/placeholder-product.jpg'}
+                      alt={product.title || 'Producto'}
+                      className="max-w-full max-h-32 object-contain"
+                    />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">{product.title || 'Sin título'}</h3>
+                  <p className="text-sm text-gray-500 mb-3">{product.description || 'Sin descripción'}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-purple-600">${product.price}</span>
+                    <div className="text-xs text-gray-500">
+                      {product.rating ? `${product.rating.toFixed(1)}★` : 'Sin rating'}
+                      {product.reviewCount ? ` (${product.reviewCount} rev)` : ''}
+                    </div>
+                  </div>
+                  <div className="mt-3 text-right">
+                    <button
+                      onClick={() => router.push(`/admin/products/new/${product.id}`)}
+                      className="text-sm text-purple-600 hover:underline"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="text-sm text-red-600 hover:text-red-900 ml-2"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-gray-500">No hay productos en el catálogo</p>
+              <p className="text-sm text-gray-400">Sé el primero en agregar un producto</p>
+            </div>
+          )}
         </div>
       </section>
     </div>
@@ -124,8 +202,6 @@ function DashboardContent() {
 
 export default function AdminDashboard() {
   return (
-    <AdminAuthProvider>
-      <DashboardContent />
-    </AdminAuthProvider>
+    <>{/* Wrapper necesario para JSX */}</>
   );
 }
