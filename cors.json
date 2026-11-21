@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://tienda22077--tiendaldg.us-east4.hosted.app"],
+    "method": ["GET", "PUT", "POST", "DELETE"],
+    "header": ["*"],
+    "maxAgeSeconds": 3600
+  }
+]

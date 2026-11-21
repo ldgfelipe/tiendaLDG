@@ -36,10 +36,11 @@ export class ImageUploadService {
       // Obtener URL pública
       const downloadURL = await getDownloadURL(snapshot.ref);
       
+      // Retornar la URL absoluta
       return downloadURL;
     } catch (error) {
       console.error('Error subiendo imagen:', error);
-      throw new Error('Error al subir la imagen');
+      throw new Error('Error al subir la imagen: ' + (error as Error).message);
     }
   }
 
@@ -50,6 +51,32 @@ export class ImageUploadService {
     });
     
     return Promise.all(uploadPromises);
+  }
+
+  /**
+   * Convierte una URL de Firebase Storage a URL relativa del proxy
+   * Esto evita problemas de CORS cuando se carga la imagen
+   */
+  static convertToProxyUrl(firebaseUrl: string): string {
+    if (!firebaseUrl || firebaseUrl === '' || firebaseUrl.includes('//')) {
+      return firebaseUrl; // Si no es una URL de Firebase, retornarla tal cual
+    }
+    
+    // Extraer la parte del path después de /o/ y antes del parámetro ?
+    const match = firebaseUrl.match(/\/o\/(.+?)\?/);
+    if (match && match[1]) {
+      const encodedPath = decodeURIComponent(match[1]);
+      return `/api/image-proxy/${encodedPath}`;
+    }
+    
+    // Intentar otra forma de parseo
+    const parts = firebaseUrl.split('/o/');
+    if (parts.length > 1) {
+      const pathPart = parts[1].split('?')[0];
+      return `/api/image-proxy/${pathPart}`;
+    }
+    
+    return firebaseUrl;
   }
 
   async deleteImage(url: string): Promise<void> {

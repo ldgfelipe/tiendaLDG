@@ -69,12 +69,14 @@ function ProductForm() {
       const urls = await Promise.all(
         files.map(f => imageService.uploadImage(f, `products/${Date.now()}_${f.name}`))
       );
-      setUploadedImages(prev => [...prev, ...urls]);
+      // Convertir URLs a proxy relative para evitar CORS
+      const proxyUrls = urls.map(url => ImageUploadService.convertToProxyUrl(url));
+      setUploadedImages(proxyUrls);
       setImageError(null);
     } catch (error: any) {
       console.error('Error subiendo imagen:', error);
-      // Error amigable: si es CORS, sugerir al usuario
-      setImageError('No se pudo subir la imagen. Verifica la configuración CORS de Firebase Storage.');
+      // Error amigable
+      setImageError('No se pudo subir la imagen. Verifica la configuración de Firebase Storage.');
       alert('Error al subir imagen: ' + (error.message || 'Error desconocido'));
     } finally {
       setLoading(false);
@@ -101,8 +103,9 @@ function ProductForm() {
         setPrice(data.product.price?.toString() || '0');
         if (data.product.category?.[0]) setCategory(data.product.category[0]);
         if (data.product.image) {
-          // Verificar si la imagen viene con HTTP o https válido
-          setUploadedImages([data.product.image]);
+          // Convertir URL a proxy si es necesario
+          const proxyUrl = ImageUploadService.convertToProxyUrl(data.product.image);
+          setUploadedImages([proxyUrl]);
         }
         setStep(2);
       } else {

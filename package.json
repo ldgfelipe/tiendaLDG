@@ -16,6 +16,7 @@
     "preview": "npm run build && firebase hosting:channel:deploy preview"
   },
   "dependencies": {
+    "@google-cloud/storage": "^9.0.0",
     "firebase": "^10.12.2",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.320.0",
