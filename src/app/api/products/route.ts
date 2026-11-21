@@ -1,46 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Product } from '@/types';
 
-// Productos de ejemplo para desarrollo
-const products: Product[] = [
-  {
-    id: '1',
-    title: 'Zapato deportivo premium',
-    description: 'Zapato deportivo de alta calidad con tecnología de amortiguación avanzada',
-    price: 89.99,
-    originalPrice: 120,
-    category: ['Calzado'],
-    affiliateLink: 'https://example.com/affiliate1',
-    image: '/placeholder-product.jpg',
-    images: ['/placeholder-product.jpg'],
-    rating: 4.7,
-    reviewCount: 128,
-    clickCount: 45,
-    affiliateProvider: 'Amazon',
-    commission: 8,
-    lastUpdated: new Date(),
-    seoKeywords: ['zapatos', 'deportivos', 'premium'],
-    aiSummary: 'Excelente calzado deportivo con buenas reseñas.'
-  },
-  {
-    id: '2',
-    title: 'Camisa de fotosynthesis',
-    description: 'Camisa elegante para el día a día',
-    price: 45.99,
-    category: ['Ropa'],
-    affiliateLink: 'https://example.com/affiliate2',
-    image: '/placeholder-product.jpg',
-    images: ['/placeholder-product.jpg'],
-    rating: 4.5,
-    reviewCount: 89,
-    clickCount: 32,
-    affiliateProvider: 'ShareASale',
-    commission: 5,
-    lastUpdated: new Date(),
-    seoKeywords: ['camisa', 'elegante', 'diario'],
-    aiSummary: 'Camisa versátil y cómoda para uso diario.'
-  }
-];
+// Productos - sin datos de ejemplo (vacío hasta que el usuario agregue)
+const products: Product[] = [];
 
 export async function GET(request: NextRequest) {
   try {

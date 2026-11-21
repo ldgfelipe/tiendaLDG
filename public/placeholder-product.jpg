@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f3f4f6" width="400" height="300"/>
+  <text x="200" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#9ca3af">Sin imagen</text>
+  <text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#d1d5db">Producto sin fotografía</text>
+</svg>
