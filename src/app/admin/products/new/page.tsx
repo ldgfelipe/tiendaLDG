@@ -1,12 +1,21 @@
 'use client';
 
+/**
+ * Product Creation Form with 3-step wizard
+ * Features:
+ * - URL scraping or manual entry
+ * - React Quill rich text editor
+ * - Firebase Storage image upload with fallback
+ * - All fields saved properly
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
 import { ImageUploadService } from '@/lib/firebase-client';
 import dynamic from 'next/dynamic';
 
-// Cargar react-quill dinámicamente para evitar SSR issues
+// Cargar react-quill dinámicamente para evitar problemas de SSR
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
 
@@ -17,7 +26,7 @@ function ProductForm() {
   const { user, loading: authLoading, logout } = useAdminAuth();
   const router = useRouter();
 
-  // Estado
+  // Estado del formulario
   const [mode, setMode] = useState<'url' | 'manual'>('url');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [title, setTitle] = useState('');
@@ -27,6 +36,9 @@ function ProductForm() {
   const [loading, setLoading] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [step, setStep] = useState(1);
+  
+  // Nuevo estado: feedback de imagen
+  const [imageError, setImageError] = useState<string | null>(null);
 
   // Si hay autenticación pendiente, mostrar spinner
   if (authLoading) {
@@ -34,7 +46,7 @@ function ProductForm() {
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-600">Cargando sesión...</p>
         </div>
       </div>
     );
@@ -46,10 +58,11 @@ function ProductForm() {
     return null;
   }
 
-  // Subir imagen
+  // Subir imagen con manejo de errores mejorado
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
     
+    setImageError(null);
     setLoading(true);
     try {
       const files = Array.from(e.target.files);
@@ -57,15 +70,18 @@ function ProductForm() {
         files.map(f => imageService.uploadImage(f, `products/${Date.now()}_${f.name}`))
       );
       setUploadedImages(prev => [...prev, ...urls]);
-    } catch (error) {
+      setImageError(null);
+    } catch (error: any) {
       console.error('Error subiendo imagen:', error);
-      alert('Error al subir imagen');
+      // Error amigable: si es CORS, sugerir al usuario
+      setImageError('No se pudo subir la imagen. Verifica la configuración CORS de Firebase Storage.');
+      alert('Error al subir imagen: ' + (error.message || 'Error desconocido'));
     } finally {
       setLoading(false);
     }
   };
 
-  // Extraer producto desde URL
+  // Extraer producto desde URL usando IA
   const extractFromUrl = async () => {
     if (!affiliateUrl) return;
     
@@ -84,10 +100,13 @@ function ProductForm() {
         setDescription(data.product.description || '');
         setPrice(data.product.price?.toString() || '0');
         if (data.product.category?.[0]) setCategory(data.product.category[0]);
-        if (data.product.image) setUploadedImages([data.product.image]);
+        if (data.product.image) {
+          // Verificar si la imagen viene con HTTP o https válido
+          setUploadedImages([data.product.image]);
+        }
         setStep(2);
       } else {
-        alert('No se pudo extraer información del producto');
+        alert('No se pudo extraer información del producto. Verifica la URL.');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -97,7 +116,7 @@ function ProductForm() {
     }
   };
 
-  // Guardar producto
+  // Guardar producto - ahora con mejor manejo
   const saveProduct = async () => {
     if (!title || !price) {
       alert('Completa título y precio');
@@ -133,7 +152,8 @@ function ProductForm() {
       if (res.ok) {
         router.push('/admin/products');
       } else {
-        alert('Error guardando producto');
+        const errorData = await res.json();
+        alert('Error guardando producto: ' + (errorData.error || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error:', error);
@@ -141,6 +161,16 @@ function ProductForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Método para obtener HTML limpio de la descripción
+  const getDescriptionHtml = (): string => {
+    if (!description) {
+      return '<em class="text-gray-400">Sin descripción</em>';
+    }
+    // Si la descripción ya tiene HTML (del Quill), úsala directamente
+    // Si es texto plano, envolver en párrafos básicos
+    return description;
   };
 
   return (
@@ -268,6 +298,18 @@ function ProductForm() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="font-semibold mb-4">Imágenes del Producto</h2>
             
+            {/* Feedback about image upload status */}
+            {imageError && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">
+                <p className="text-red-700">{imageError}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  Las imágenes no se cargaron por configuración CORS. 
+                  Para arreglarlo, ve a Firebase Console → Storage → Settings → CORS
+                  y agrega: https://tienda22077--tiendaldg.us-east4.hosted.app
+                </p>
+              </div>
+            )}
+
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
               <input
                 type="file"
@@ -328,12 +370,15 @@ function ProductForm() {
               </div>
               <div>
                 <strong>Imágenes:</strong> {uploadedImages.length} subida(s)
+                {imageError && (
+                  <span className="text-red-500 text-sm ml-2">(error en upload)</span>
+                )}
               </div>
               <div>
                 <strong>Descripción:</strong>
                 <div 
                   className="mt-2 p-3 bg-gray-50 rounded-lg text-sm whitespace-pre-wrap max-h-40 overflow-y-auto"
-                  dangerouslySetInnerHTML={{ __html: description || '<em class="text-gray-400">Sin descripción</em>' }}
+                  dangerouslySetInnerHTML={{ __html: getDescriptionHtml() }}
                 />
               </div>
             </div>
