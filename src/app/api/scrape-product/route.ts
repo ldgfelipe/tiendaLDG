@@ -1,23 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+// Configuración de proveedores de IA GRATIS
+// Puedes configurar aquí tus claves API gratuitas
+const AI_CONFIG = {
+  // Opción 1: OpenAI (tiene free tier con $5 gratis al registrarse)
+  openai: {
+    enabled: process.env.OPENAI_API_KEY ? true : false,
+    model: 'gpt-4o-mini',
+  },
+  // Opción 2: Ollama (local, totalmente gratis, se ejecuta en tu servidor)
+  ollama: {
+    enabled: false, // Cambiar a true si tienes Ollama instalado
+    baseUrl: 'http://localhost:11434',
+    model: 'llama3.2',
+  },
+  // Opción 3: Gemini (Google, free tier disponible)
+  gemini: {
+    enabled: process.env.GEMINI_API_KEY ? true : false,
+    model: 'gemini-1.5-flash',
+  },
+  // Opción 4: Proveedores gratuitos locales
+  free: {
+    enabled: true,
+    fallback: true,
+  }
+};
 
 async function callOpenAI(messages: any[], maxTokens: number = 1500) {
-  const response = await fetch(OPENAI_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages,
-      temperature: 0.3,
-      max_tokens: maxTokens
-    })
-  });
-  return response.json();
+  // Si tiene clave OpenAI, úsala
+  if (process.env.OPENAI_API_KEY) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: 0.3,
+        max_tokens: maxTokens
+      })
+    });
+    return response.json();
+  }
+  
+  // Si tiene clave Gemini, úsala
+  if (process.env.GEMINI_API_KEY) {
+    // Implementar llamada a Gemini
+    // Por ahora retornamos error para implementar después
+    throw new Error('Gemini API no implementado en esta versión');
+  }
+
+  // Si tiene Ollama local, úsalo
+  if (process.env.OLLAMA_URL) {
+    const response = await fetch(`${process.env.OLLAMA_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama3.2',
+        messages,
+        stream: false
+      })
+    });
+    return response.json();
+  }
+
+  // Fallback: Si NO hay APIs, usar modo "falso" para desarrollo
+  return {
+    choices: [{
+      message: {
+        content: JSON.stringify({
+          title: 'Producto desde afiliado (Modo Desarrollo)',
+          description: 'Información extraída manualmente',
+          price: 99.99,
+          category: ['Sin categoría'],
+          images: [],
+          features: []
+        })
+      }
+    }]
+  };
 }
 
 function detectProvider(url: string): string {
@@ -106,7 +169,7 @@ export async function POST(request: NextRequest) {
       },
       {
         role: 'user',
-        content: `Por favor extrae la información del producto en la URL: ${url}`
+        content: `URL del producto: ${url}`
       }
     ], 2000);
 
@@ -129,10 +192,7 @@ export async function POST(request: NextRequest) {
         originalPrice: null,
         category: [provider],
         images: [],
-        features: [],
-        rating: 0,
-        reviewCount: 0,
-        affiliateProvider: provider,
+        features: []
       };
     }
 
@@ -155,8 +215,6 @@ export async function POST(request: NextRequest) {
     } catch {}
 
     // Paso 3: Generar keywords LSI
-    const keywordsPrompt = `Genera 10 palabras clave LSI relevantes para este producto: ${productInfo.title || 'producto'}. 
-    Responde solo con una lista separada por comas.`;
     const keywordsResponse = await callOpenAI([
       {
         role: 'system',
