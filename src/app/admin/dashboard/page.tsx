@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/components/AdminAuthWrapper';
-import { Product } from '@/types';
 
-function DashboardContent() {
+export default function AdminDashboard() {
   const { user, loading, logout } = useAdminAuth();
   const router = useRouter();
 
@@ -26,23 +25,22 @@ function DashboardContent() {
     const loadProducts = async () => {
       setLoadingProducts(true);
       try {
-        // En producción, traería desde Firebase/Firestore API
-        // Por ahora: datos mock o vacíos
+        // Mock de datos
         const mockProducts: any[] = [
           {
             id: '1',
-            title: 'Producto en carga',
-            description: 'El primer producto se está agregando...',
-            price: 0,
-            originalPrice: null,
+            title: 'Producto de ejemplo',
+            description: 'Este es un producto de prueba',
+            price: 99.99,
+            originalPrice: 149.99,
             category: ['Sin categoría'],
             affiliateLink: '',
             affiliateProvider: 'manual',
             image: '/placeholder-product.jpg',
             images: ['/placeholder-product.jpg'],
-            rating: 0,
-            reviewCount: 0,
-            clickCount: 0,
+            rating: 4.5,
+            reviewCount: 12,
+            clickCount: 45,
             seoKeywords: [],
             aiSummary: 'Producto recién agregado al catálogo',
           }
@@ -58,7 +56,7 @@ function DashboardContent() {
       }
     };
     loadProducts();
-  }, []); // Dependency array vacío - llamado solo una vez
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('¿Estás seguro de eliminar este producto?')) {
@@ -142,14 +140,6 @@ function DashboardContent() {
             </div>
           ) : null}
 
-          {/* Empty State */}
-          {!loadingProducts && products.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No hay productos en el catálogo</p>
-              <p className="text-sm text-gray-400">Sé el primero en agregar un producto</p>
-            </div>
-          ) : null}
-
           {/* Products List */}
           {!loadingProducts && products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,7 +163,7 @@ function DashboardContent() {
                   </div>
                   <div className="mt-3 text-right">
                     <button
-                      onClick={() => router.push(`/admin/products/new/${product.id}`)}
+                      onClick={() => router.push(`/admin/products/new`)}
                       className="text-sm text-purple-600 hover:underline"
                     >
                       Editar
@@ -197,11 +187,5 @@ function DashboardContent() {
         </div>
       </section>
     </div>
-  );
-}
-
-export default function AdminDashboard() {
-  return (
-    <>{/* Wrapper necesario para JSX */}</>
   );
 }

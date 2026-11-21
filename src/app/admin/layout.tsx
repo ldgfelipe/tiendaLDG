@@ -1,12 +1,16 @@
-// Server Component - Admin Layout
-// Este layout envuelve todas las páginas del admin
+'use client';
+
+import { ReactNode } from 'react';
+import { AdminAuthProvider } from '@/components/AdminAuthWrapper';
 
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <>{children}</>
+    <AdminAuthProvider>
+      {children}
+    </AdminAuthProvider>
   );
 }
