@@ -18,32 +18,6 @@ export default function AdminDashboard() {
     }
   }, [user, authLoading, router]);
 
-  // Cargar productos al montar (solo cuando autenticado)
-  useEffect(() => {
-    if (!user || authLoading) return;
-    
-    setLoadingProducts(true);
-    setTimeout(() => {
-      setProducts([
-        {
-          id: 'demo-1',
-          title: 'Producto Demo - Sudadera Premium',
-          description: 'Sudadera con capucha para hombre, felpa gruesa, ideal para invierno',
-          price: 367,
-          originalPrice: 700,
-          category: ['Ropa'],
-          affiliateLink: '#',
-          affiliateProvider: 'mercadolibre',
-          image: '',
-          images: [],
-          rating: 4.5,
-          reviewCount: 128,
-        }
-      ]);
-      setLoadingProducts(false);
-    }, 500);
-  }, [user, authLoading]);
-
   // Spinner de autenticación
   if (authLoading) {
     return (
