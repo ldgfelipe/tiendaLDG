@@ -4,6 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/components/AdminAuthWrapper';
 import { ImageUploadService } from '@/lib/firebase-client';
+import dynamic from 'next/dynamic';
+
+// Cargar react-quill dinámicamente para evitar SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 const CATEGORIES = ['Calzado', 'Ropa', 'Tecnología', 'Hogar', 'Belleza', 'Deportes'];
 const imageService = new ImageUploadService();
@@ -201,13 +206,36 @@ function ProductForm() {
                 placeholder="Nombre del producto"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3"
               />
-              <textarea
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="Descripción del producto"
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3"
-              />
+              
+              {/* Rich Text Editor */}
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Descripción <span className="text-gray-400">(texto enriquecido)</span>
+                </label>
+                <ReactQuill
+                  theme="snow"
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="Escribe una descripción detallada del producto..."
+                  className="min-h-[150px] bg-white rounded-lg"
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ color: [] }, { background: [] }],
+                      [{ list: 'ordered' }, { list: 'bullet' }],
+                      [{ align: [] }],
+                      ['blockquote', 'code-block'],
+                      ['link', 'image'],
+                      ['clean']
+                    ]
+                  }}
+                />
+                <div className="mt-1 text-xs text-gray-500">
+                  Usa el editor para formatear texto: negrita, listas, colores, tablas, etc.
+                </div>
+              </div>
+
               <div className="flex gap-3 mb-3">
                 <input
                   type="number"
@@ -287,12 +315,27 @@ function ProductForm() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="font-semibold mb-4">Confirmar Producto</h2>
             
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4 mb-6">
               <div><strong>Título:</strong> {title || '(sin título)'}</div>
-              <div><strong>Precio:</strong> ${price}</div>
-              <div><strong>Categoría:</strong> {category || 'Sin categoría'}</div>
-              <div><strong>URL Afiliado:</strong> {affiliateUrl || 'No proporcionada'}</div>
-              <div><strong>Imágenes:</strong> {uploadedImages.length} subida(s)</div>
+              <div>
+                <strong>Precio:</strong> ${price}
+              </div>
+              <div>
+                <strong>Categoría:</strong> {category || 'Sin categoría'}
+              </div>
+              <div>
+                <strong>URL Afiliado:</strong> {affiliateUrl || 'No proporcionada'}
+              </div>
+              <div>
+                <strong>Imágenes:</strong> {uploadedImages.length} subida(s)
+              </div>
+              <div>
+                <strong>Descripción:</strong>
+                <div 
+                  className="mt-2 p-3 bg-gray-50 rounded-lg text-sm whitespace-pre-wrap max-h-40 overflow-y-auto"
+                  dangerouslySetInnerHTML={{ __html: description || '<em class="text-gray-400">Sin descripción</em>' }}
+                />
+              </div>
             </div>
 
             <div className="flex gap-4">
