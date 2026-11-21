@@ -5,187 +5,163 @@ import { useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/components/AdminAuthWrapper';
 
 export default function AdminDashboard() {
-  const { user, loading, logout } = useAdminAuth();
+  const { user, loading: authLoading, logout } = useAdminAuth();
   const router = useRouter();
-
-  // Redirigir si no está autenticado (hooks en mismo orden)
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/admin/login');
-    }
-  }, [user, loading, router]);
-
-  // State en orden consistente
+  
   const [products, setProducts] = useState<any[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
-  // Cargar productos - useEffect al final
+  // Redirigir si no autenticado
   useEffect(() => {
-    const loadProducts = async () => {
-      setLoadingProducts(true);
-      try {
-        // Mock de datos
-        const mockProducts: any[] = [
-          {
-            id: '1',
-            title: 'Producto de ejemplo',
-            description: 'Este es un producto de prueba',
-            price: 99.99,
-            originalPrice: 149.99,
-            category: ['Sin categoría'],
-            affiliateLink: '',
-            affiliateProvider: 'manual',
-            image: '/placeholder-product.jpg',
-            images: ['/placeholder-product.jpg'],
-            rating: 4.5,
-            reviewCount: 12,
-            clickCount: 45,
-            seoKeywords: [],
-            aiSummary: 'Producto recién agregado al catálogo',
-          }
-        ];
-        setProducts(mockProducts);
-        setError(null);
-      } catch (err) {
-        console.error('Error cargando productos:', err);
-        setProducts([]);
-        setError('Error al cargar productos. Inténtalo de nuevo.');
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-    loadProducts();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm('¿Estás seguro de eliminar este producto?')) {
-      try {
-        setProducts(products.filter(p => p.id !== id));
-      } catch (error) {
-        console.error('Error eliminando producto:', error);
-      }
+    if (!authLoading && !user) {
+      router.replace('/admin/login');
     }
-  };
+  }, [user, authLoading, router]);
 
+  // Cargar productos al montar (solo cuando autenticado)
+  useEffect(() => {
+    if (!user || authLoading) return;
+    
+    setLoadingProducts(true);
+    setTimeout(() => {
+      setProducts([
+        {
+          id: 'demo-1',
+          title: 'Producto Demo - Sudadera Premium',
+          description: 'Sudadera con capucha para hombre, felpa gruesa, ideal para invierno',
+          price: 367,
+          originalPrice: 700,
+          category: ['Ropa'],
+          affiliateLink: '#',
+          affiliateProvider: 'mercadolibre',
+          image: '',
+          images: [],
+          rating: 4.5,
+          reviewCount: 128,
+        }
+      ]);
+      setLoadingProducts(false);
+    }, 500);
+  }, [user, authLoading]);
+
+  // Spinner de autenticación
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No autenticado - mostrar mensaje
+  if (!user) {
+    return null;
+  }
+
+  // Dashboard principal
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Hola, {user?.email?.split('@')[0] || 'Admin'}</span>
+              <span className="text-sm text-gray-600 hidden sm:inline">
+                Hola, {user.email?.split('@')[0]}
+              </span>
               <button
-                onClick={() => logout()}
+                onClick={logout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
               >
-                Cerrar sesión
+                Salir
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Stats Cards */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-sm text-gray-600">Productos</h3>
+      {/* Stats */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <p className="text-sm text-gray-500">Productos</p>
             <p className="text-2xl font-bold text-purple-600">{products.length}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-sm text-gray-600">Clicks</h3>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <p className="text-sm text-gray-500">Clicks</p>
             <p className="text-2xl font-bold text-emerald-600">0</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-sm text-gray-600">Conversiones</h3>
-            <p className="text-2xl font-bold text-indigo-600">0</p>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <p className="text-sm text-gray-500">Conversiones</p>
+            <p className="text-2xl font-bold text-blue-600">0</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-sm text-gray-600">Ingresos</h3>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <p className="text-sm text-gray-500">Ingresos</p>
             <p className="text-2xl font-bold text-pink-600">$0</p>
           </div>
         </div>
-      </section>
 
-      {/* Content */}
-      <section className="container mx-auto px-4 py-8">
+        {/* Action buttons */}
         <div className="flex gap-4 mb-8">
           <a
             href="/admin/products/new"
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 rounded-lg text-white text-center hover:opacity-90 transition-colors"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium"
           >
-            + Agregar Nuevo Producto
+            + Agregar Producto
+          </a>
+          <a
+            href="/admin/settings/ai-configuration"
+            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium"
+          >
+            ⚙️ Configurar IA
           </a>
         </div>
 
-        {/* Products Grid */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold mb-4">Productos en Catálogo</h2>
-
-          {/* Loading State */}
-          {loadingProducts && !error ? (
-            <div className="min-h-[200px] flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent mx-auto mb-4"></div>
-              <p className="text-gray-500">Cargando productos...</p>
+        {/* Products */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold mb-4">Catálogo de Productos</h2>
+          
+          {loadingProducts ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-4 border-purple-600 border-t-transparent mx-auto"></div>
+              <p className="mt-4 text-gray-500">Cargando productos...</p>
             </div>
-          ) : null}
-
-          {/* Error State */}
-          {loadingProducts && error ? (
-            <div className="p-6 bg-red-50 rounded-lg text-red-700">
-              <p className="font-medium">{error}</p>
+          ) : products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg mb-2">No hay productos</p>
+              <p className="text-gray-400 text-sm mb-4">Agrega tu primer producto desde arriba</p>
+              <a
+                href="/admin/products/new"
+                className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg"
+              >
+                Agregar Producto
+              </a>
             </div>
-          ) : null}
-
-          {/* Products List */}
-          {!loadingProducts && products.length > 0 ? (
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product: any) => (
-                <div key={product.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="h-32 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
-                    <img
-                      src={product.image || '/placeholder-product.jpg'}
-                      alt={product.title || 'Producto'}
-                      className="max-w-full max-h-32 object-contain"
-                    />
+                <div key={product.id} className="border rounded-lg overflow-hidden">
+                  <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">Sin imagen</span>
                   </div>
-                  <h3 className="font-medium text-gray-900 mb-2">{product.title || 'Sin título'}</h3>
-                  <p className="text-sm text-gray-500 mb-3">{product.description || 'Sin descripción'}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-purple-600">${product.price}</span>
-                    <div className="text-xs text-gray-500">
-                      {product.rating ? `${product.rating.toFixed(1)}★` : 'Sin rating'}
-                      {product.reviewCount ? ` (${product.reviewCount} rev)` : ''}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-1">{product.title}</h3>
+                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">{product.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-purple-600">${product.price}</span>
+                      <span className="text-xs text-gray-400">{product.category[0]}</span>
                     </div>
-                  </div>
-                  <div className="mt-3 text-right">
-                    <button
-                      onClick={() => router.push(`/admin/products/new`)}
-                      className="text-sm text-purple-600 hover:underline"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="text-sm text-red-600 hover:text-red-900 ml-2"
-                    >
-                      Eliminar
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="py-12 text-center">
-              <p className="text-gray-500">No hay productos en el catálogo</p>
-              <p className="text-sm text-gray-400">Sé el primero en agregar un producto</p>
-            </div>
           )}
         </div>
-      </section>
+      </main>
     </div>
   );
 }
