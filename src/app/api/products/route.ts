@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { productFirestore } from '@/lib/firebase-admin';
 import { Product } from '@/types';
-
-// Productos - sin datos de ejemplo (vacío hasta que el usuario agregue)
-const products: Product[] = [];
 
 export async function GET(request: NextRequest) {
   try {
-    // En producción, aquí cargarías desde Firestore
-    // Por ahora devolvemos datos de ejemplo
+    const products = await productFirestore.getAll();
     return NextResponse.json({
       products,
-      success: true
+      success: true,
     });
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json({
       products: [],
       success: false,
-      error: 'Error al cargar productos'
+      error: 'Error al cargar productos',
     }, { status: 500 });
   }
 }
@@ -26,35 +23,41 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const newProduct: Product = {
-      id: Date.now().toString(),
+      id: body.id || Date.now().toString(),
       title: body.title || '',
       description: body.description || '',
       price: body.price || 0,
+      originalPrice: body.originalPrice || null,
+      affiliateLink: body.affiliateLink || '',
       image: body.image || '/placeholder-product.jpg',
       images: body.images || ['/placeholder-product.jpg'],
       category: body.category || [],
       rating: body.rating || 0,
       reviewCount: body.reviewCount || 0,
-      affiliateLink: body.affiliateLink || '',
+      clickCount: body.clickCount || 0,
       affiliateProvider: body.affiliateProvider || 'Other',
       commission: body.commission || 0,
       lastUpdated: new Date(),
       seoKeywords: body.seoKeywords || [],
       aiSummary: body.aiSummary || body.description,
+      targetAudience: body.targetAudience || [],
+      features: body.features || [],
+      pros: body.pros || [],
+      cons: body.cons || [],
+      faq: body.faq || [],
     };
-    
-    // En producción, guardarías en Firestore
-    // products.push(newProduct);
-    
+
+    const savedProduct = await productFirestore.create(newProduct);
+
     return NextResponse.json({
-      product: newProduct,
-      success: true
+      product: savedProduct,
+      success: true,
     });
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json({
       success: false,
-      error: 'Error al crear producto'
+      error: 'Error al crear producto: ' + (error as Error).message,
     }, { status: 500 });
   }
 }

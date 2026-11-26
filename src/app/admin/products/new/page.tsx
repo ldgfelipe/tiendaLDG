@@ -119,10 +119,27 @@ function ProductForm() {
     }
   };
 
+  // Detectar proveedor desde la URL de referido
+  const detectProvider = (url: string): string => {
+    const lower = url.toLowerCase();
+    if (lower.includes('mercadolibre') || lower.includes('mercadolibre.com')) return 'mercadolibre';
+    if (lower.includes('amazon') || lower.includes('amzn.to')) return 'amazon';
+    if (lower.includes('ebay')) return 'ebay';
+    if (lower.includes('walmart')) return 'walmart';
+    if (lower.includes('target')) return 'target';
+    return 'other';
+  };
+
   // Guardar producto - ahora con mejor manejo
   const saveProduct = async () => {
     if (!title || !price) {
       alert('Completa título y precio');
+      return;
+    }
+
+    if (!affiliateUrl || !affiliateUrl.startsWith('http')) {
+      alert('Agrega un link de referido válido (debe empezar con https://)');
+      setStep(1);
       return;
     }
     
@@ -135,15 +152,20 @@ function ProductForm() {
         price: parseFloat(price),
         originalPrice: null,
         category: [category || 'Sin categoría'],
-        affiliateLink: affiliateUrl || '#',
-        affiliateProvider: 'mercadolibre',
-        image: uploadedImages[0] || '',
-        images: uploadedImages,
+        affiliateLink: affiliateUrl,
+        affiliateProvider: detectProvider(affiliateUrl),
+        image: uploadedImages[0] || '/placeholder-product.jpg',
+        images: uploadedImages.length ? uploadedImages : ['/placeholder-product.jpg'],
         rating: 0,
         reviewCount: 0,
         clickCount: 0,
         seoKeywords: [],
-        aiSummary: description,
+        aiSummary: description.replace(/<[^>]*>/g, ' ').slice(0, 200),
+        targetAudience: [],
+        features: [],
+        pros: [],
+        cons: [],
+        faq: [],
       };
 
       const res = await fetch('/api/products', {
@@ -286,6 +308,24 @@ function ProductForm() {
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
+
+              {/* LINK DE REFERIDO - campo obligatorio para que los visitantes abran el producto en la tienda */}
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  🔗 Link de referido <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={affiliateUrl}
+                  onChange={e => setAffiliateUrl(e.target.value)}
+                  placeholder="https://mercadolibre.com.mx/producto..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Los visitantes serán llevados a esta URL al hacer clic en "Comprar Ahora".
+                </p>
+              </div>
+
               <button
                 onClick={() => setStep(2)}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg"
