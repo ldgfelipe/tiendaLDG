@@ -1,74 +1,80 @@
-// Cliente Firebase para el servidor (API routes)
-// Usa la configuración pública del proyecto Firebase
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, increment } from 'firebase/firestore';
+// Admin SDK de Firebase para las API routes del servidor.
+// El Admin SDK omite las reglas de seguridad de Firestore, por lo que permite
+// crear/actualizar/eliminar productos sin necesidad de un usuario autenticado.
+import { initializeApp, applicationDefault, getApps } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyAtdzDzkjkZBhPLgnzemJbYxNwsdVpd8TQ',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'tiendaldg.firebaseio.com',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'tiendaldg',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'tiendaldg.appspot.com',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '379198593942',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:379198593942:web:9f17f3f60a916394b8dbb7',
-};
+// Inicializar solo una vez (Next.js puede recargar módulos en dev)
+if (!getApps().length) {
+  initializeApp({
+    credential: applicationDefault(),
+    projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'tiendaldg',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'tiendaldg.appspot.com',
+  });
+}
 
-// Inicializar Firebase (reutilizar si ya existe)
-const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getFirestore();
+const productsCollection = db.collection('products');
 
-const productsCollection = collection(db, 'products');
+// Convertir timestamps de Firestore a Date/ISO para el frontend
+function serialize(doc: any) {
+  const data = doc.data();
+  const serialized: any = { ...data };
 
-// Funciones helper para productos
+  for (const key of Object.keys(serialized)) {
+    const value = serialized[key];
+    if (value && typeof value.toDate === 'function') {
+      serialized[key] = value.toDate().toISOString();
+    }
+  }
+
+  return { id: doc.id, ...serialized };
+}
+
 export const productFirestore = {
   async create(productData: any) {
     const id = productData.id || Date.now().toString();
-    const docRef = doc(db, 'products', id);
+    const docRef = productsCollection.doc(id);
     const product = {
       ...productData,
       id,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       clickCount: productData.clickCount || 0,
     };
-    await setDoc(docRef, product);
+    delete (product as any).lastUpdated; // Evitar conflictos con Date serializado
+    await docRef.set(product);
     return product;
   },
 
   async getAll() {
-    const snapshot = await getDocs(productsCollection);
-    return snapshot.docs.map(d => ({
-      id: d.id,
-      ...d.data(),
-    }));
+    const snapshot = await productsCollection.orderBy('createdAt', 'desc').get();
+    return snapshot.docs.map(serialize);
   },
 
   async getById(id: string) {
-    const docRef = doc(db, 'products', id);
-    const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) return null;
-    return { id: docSnap.id, ...docSnap.data() };
+    const doc = await productsCollection.doc(id).get();
+    if (!doc.exists) return null;
+    return serialize(doc);
   },
 
   async update(id: string, data: any) {
-    const docRef = doc(db, 'products', id);
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: serverTimestamp(),
-    });
-    return { id, ...data };
+    const docRef = productsCollection.doc(id);
+    const updateData = { ...data, updatedAt: new Date() };
+    delete (updateData as any).id;
+    await docRef.update(updateData);
+    return { id, ...updateData };
   },
 
   async delete(id: string) {
-    const docRef = doc(db, 'products', id);
-    await deleteDoc(docRef);
+    await productsCollection.doc(id).delete();
     return { success: true };
   },
 
   async incrementClick(id: string) {
-    const docRef = doc(db, 'products', id);
-    await updateDoc(docRef, {
-      clickCount: increment(1),
-      lastUpdated: serverTimestamp(),
+    await productsCollection.doc(id).update({
+      clickCount: FieldValue.increment(1),
+      lastUpdated: new Date(),
     });
     return { success: true };
   },
