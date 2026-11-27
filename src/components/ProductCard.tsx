@@ -94,11 +94,11 @@ export default function ProductCard({ product, featured = false }: ProductCardPr
           <div className="flex items-center gap-2">
             {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-sm text-gray-500 line-through">
-                ${affiliateService.formatPrice(product.originalPrice)}
+                {affiliateService.formatPrice(product.originalPrice)}
               </span>
             )}
             <span className="text-lg font-bold text-indigo-600">
-              ${affiliateService.formatPrice(product.price)}
+              {affiliateService.formatPrice(product.price)}
             </span>
           </div>
 

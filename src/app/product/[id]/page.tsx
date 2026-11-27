@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Product } from '@/types';
 import { productFirestore } from '@/lib/firebase-admin';
 import AffiliateButton from '@/components/AffiliateButton';
+import { AffiliateService } from '@/services/affiliate-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,8 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   if (!product) {
     notFound();
   }
+
+  const formatPrice = (value: number) => new AffiliateService().formatPrice(value);
 
   const hasAffiliateLink = Boolean(
     product.affiliateLink &&
@@ -73,9 +76,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
               {/* Precio */}
               <div className="flex items-center gap-3 mb-4">
                 {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-xl text-gray-500 line-through">${product.originalPrice}</span>
+                  <span className="text-xl text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
                 )}
-                <span className="text-4xl font-bold text-indigo-600">${product.price}</span>
+                <span className="text-4xl font-bold text-indigo-600">{formatPrice(product.price)}</span>
               </div>
 
               {product.reviewCount > 0 && (
